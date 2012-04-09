@@ -1,3 +1,3 @@
 """Command-Line Kestrel Client"""
 
-from client import Client
+from cli import CommandLine

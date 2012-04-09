@@ -5,7 +5,6 @@ Created on 2012/04/09
 '''
 import sys
 import kestrel
-from test.test_iterlen import len
 
 
 class CommandLine:
