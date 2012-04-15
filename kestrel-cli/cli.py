@@ -27,10 +27,13 @@ class CommandParser:
         subparsers = parser.add_subparsers(
            description="kestrel commands", dest="command")
 
-        self.add_subcommand_parser(
+        get_parser = self.add_subcommand_parser(
             subparsers, "get", "get and remove an item from a queue")
-        self.add_subcommand_parser(
+        self.add_arguments_get(get_parser)
+
+        peek_parser = self.add_subcommand_parser(
             subparsers, "peek", "get an item from a queue")
+        self.add_arguments_get(peek_parser)
 
         add_parser = self.add_subcommand_parser(
             subparsers, "set", "add an item to a queue")
@@ -70,6 +73,15 @@ class CommandParser:
             dest="port",
             help="server port (default: 22133)")
 
+    def add_arguments_get(self, parser):
+        parser.add_argument(
+            "-f",
+            type=argparse.FileType("w"),
+            default=sys.stdout,
+            metavar="<file>",
+            dest="outfile",
+            help="output data file (default: STDOUT)")
+
     def add_arguments_set(self, parser):
         parser.add_argument(
             "expiration",
@@ -77,7 +89,20 @@ class CommandParser:
             default=0,
             nargs="?",
             metavar="<expiration>",
-            help="expiration time (default 0)")
+            help="expiration time (default: 0)")
+        input_group = parser.add_mutually_exclusive_group()
+        input_group.add_argument(
+            "-f",
+            type=argparse.FileType("r"),
+            default=sys.stdin,
+            metavar="<file>",
+            dest="infile",
+            help="input data file (default: STDIN)")
+        input_group.add_argument(
+            "-d",
+            metavar="<data>",
+            dest="data",
+            help="input string data")
 
 
 class CommandLine:
@@ -96,14 +121,22 @@ class CommandLine:
         self.client = kestrel.Client(servers, args.queue)
 
     def get(self):
-        print(self.client.get())
+        data = str(self.client.peek())
+        self.args.outfile.write(data)
 
     def peek(self):
-        print(self.client.peek())
+        data = str(self.client.peek())
+        self.args.outfile.write(data)
 
     def set(self): #@ReservedAssignment @IgnorePep8
-        data = sys.stdin.read()
+        if hasattr(self.args, "data"):
+            data = self.args.data
+        else:
+            data = self.args.infile.read()
         self.client.add(data)
+
+    def delete(self):
+        self.client.delete()
 
 if __name__ == '__main__':
     parser = CommandParser(sys.argv)
