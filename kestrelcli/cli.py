@@ -1,6 +1,7 @@
-'''
-Created on 2012/04/09
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
+'''
 @author: hogelog
 '''
 import sys
@@ -138,6 +139,10 @@ class CommandLine:
     def delete(self):
         self.client.delete()
 
-if __name__ == '__main__':
+
+def main():
     parser = CommandParser(sys.argv)
     CommandLine.execute(parser.args)
+
+if __name__ == '__main__':
+    main()
