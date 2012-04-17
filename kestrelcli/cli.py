@@ -141,7 +141,7 @@ class CommandLine:
         self.client.delete(self.queue)
 
 
-def main(argv = sys.argv):
+def main(argv=sys.argv):
     parser = CommandParser(argv)
     CommandLine.execute(parser.args)
 
