@@ -2,3 +2,4 @@
 build/
 dist/
 kestrel_cli.egg-info/
+*.pyc
