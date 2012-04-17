@@ -119,29 +119,30 @@ class CommandLine:
     def __init__(self, args):
         self.args = args
         servers = ["%s:%s" % (args.hostname, args.port)]
-        self.client = kestrel.Client(servers, args.queue)
+        self.client = kestrel.Client(servers)
+        self.queue = args.queue
 
     def get(self):
-        data = str(self.client.peek())
+        data = str(self.client.get(self.queue))
         self.args.outfile.write(data)
 
     def peek(self):
-        data = str(self.client.peek())
+        data = str(self.client.peek(self.queue))
         self.args.outfile.write(data)
 
     def set(self): #@ReservedAssignment @IgnorePep8
-        if hasattr(self.args, "data"):
+        if self.args.data:
             data = self.args.data
         else:
             data = self.args.infile.read()
-        self.client.add(data)
+        self.client.add(self.queue, data)
 
     def delete(self):
-        self.client.delete()
+        self.client.delete(self.queue)
 
 
-def main():
-    parser = CommandParser(sys.argv)
+def main(argv = sys.argv):
+    parser = CommandParser(argv)
     CommandLine.execute(parser.args)
 
 if __name__ == '__main__':
