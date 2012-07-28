@@ -110,7 +110,7 @@ class CommandLine:
     @staticmethod
     def execute(args):
         cli = CommandLine(args)
-        cmdname = args.command
+        cmdname = "cmd_" + args.command
         if hasattr(cli, cmdname):
             getattr(cli, cmdname)()
         else:
@@ -122,22 +122,24 @@ class CommandLine:
         self.client = kestrel.Client(servers)
         self.queue = args.queue
 
-    def get(self):
-        data = str(self.client.get(self.queue))
-        self.args.outfile.write(data)
+    def cmd_get(self):
+        data = self.client.get(self.queue)
+        if data:
+          self.args.outfile.write(str(data))
 
-    def peek(self):
-        data = str(self.client.peek(self.queue))
-        self.args.outfile.write(data)
+    def cmd_peek(self):
+        data = self.client.peek(self.queue)
+        if data:
+          self.args.outfile.write(str(data))
 
-    def set(self): #@ReservedAssignment @IgnorePep8
+    def cmd_set(self):
         if self.args.data:
             data = self.args.data
         else:
             data = self.args.infile.read()
         self.client.add(self.queue, data)
 
-    def delete(self):
+    def cmd_delete(self):
         self.client.delete(self.queue)
 
 

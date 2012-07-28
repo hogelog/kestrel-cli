@@ -20,7 +20,7 @@ setup(name="kestrel-cli",
       entry_points={
           "console_scripts": {
               "kestrel-cli = kestrelcli.cli:main"
-          },
+          }
       },
       keywords=["kestrel cli commandline"],
       classifiers=[
