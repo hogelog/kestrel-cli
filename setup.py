@@ -8,7 +8,7 @@
 from setuptools import setup
 
 setup(name="kestrel-cli",
-      version="0.0.1",
+      version="0.0.2",
       description="kestrel command-line interface",
       license="MIT",
       author="hogelog",
