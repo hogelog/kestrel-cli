@@ -17,7 +17,8 @@ class CommandParser:
 
         def parse_args(self, args=None, namespace=None):
             try:
-                args = argparse.ArgumentParser.parse_args(self, args, namespace)
+                args = argparse.ArgumentParser.parse_args(
+                    self, args, namespace)
                 self.parse_exit = False
                 return args
             except self.ParseExit:
@@ -152,18 +153,18 @@ class CommandParser:
 
 class CommandLine:
     @staticmethod
-    def execute(args):
-        cli = CommandLine(args)
+    def execute(args, client_class=kestrel.Client):
+        cli = CommandLine(args, client_class)
         cmdname = "cmd_" + args.command
         if hasattr(cli, cmdname):
             getattr(cli, cmdname)()
         else:
             print("Invalid Command: %s" % args.command)
 
-    def __init__(self, args):
+    def __init__(self, args, client_class=kestrel.Client):
         self.args = args
         servers = ["%s:%s" % (args.hostname, args.port)]
-        self.client = kestrel.Client(servers)
+        self.client = client_class(servers)
 
     def cmd_get(self):
         data = self.client.get(self.args.queue)
@@ -183,7 +184,7 @@ class CommandLine:
         self.client.add(self.args.queue, data)
 
     def cmd_delete(self):
-        self.client.delete(self.args.queue)
+        print(self.client.delete(self.args.queue))
 
     def cmd_shell(self):
         hostname = self.args.hostname
@@ -203,10 +204,10 @@ class CommandLine:
                 exit()
 
 
-def main(argv=sys.argv):
+def main(argv=sys.argv, client_class=kestrel.Client):
     parser = CommandParser(argv)
     if not parser.parse_exit:
-        CommandLine.execute(parser.args)
+        CommandLine.execute(parser.args, client_class)
 
 if __name__ == '__main__':
     main()
