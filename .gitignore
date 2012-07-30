@@ -1,4 +1,6 @@
 .*
+!.gitignore
+!.travis.yml
 build/
 dist/
 kestrel_cli.egg-info/
