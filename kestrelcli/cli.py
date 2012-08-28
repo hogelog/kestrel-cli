@@ -8,6 +8,8 @@ import sys
 import kestrel
 import argparse
 import shlex
+import json
+import pprint
 
 
 class CommandParser:
@@ -68,6 +70,10 @@ class CommandParser:
         self.add_arguments_set(set_parser)
 
         self.add_subcommand_parser(subparsers, "delete", "drop a queue")
+
+        self.add_subparser(subparsers, "stats", "queue status")
+
+        self.add_subparser(subparsers, "list", "queue list")
 
         self.add_subparser(subparsers, "shell", "interactive shell")
 
@@ -185,6 +191,17 @@ class CommandLine:
 
     def cmd_delete(self):
         print(self.client.delete(self.args.queue))
+
+    def cmd_stats(self):
+        server, stats = self.client.stats()
+        print("server: %s" % server)
+        pprint.pprint(stats)
+
+    def cmd_list(self):
+        server, stats = self.client.stats()
+        queues = stats["queues"]
+        for queue in queues.keys():
+            print(queue)
 
     def cmd_shell(self):
         hostname = self.args.hostname
