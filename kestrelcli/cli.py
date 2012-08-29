@@ -222,6 +222,8 @@ class CommandLine:
 
 
 def main(argv=sys.argv, client_class=kestrel.Client):
+    if len(argv) == 1:
+        argv.append("--help")
     parser = CommandParser(argv)
     if not parser.parse_exit:
         CommandLine.execute(parser.args, client_class)
