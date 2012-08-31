@@ -71,6 +71,8 @@ class CommandParser:
 
         self.add_subcommand_parser(subparsers, "delete", "drop a queue")
 
+        self.add_subparser(subparsers, "delete_all", "delete all queues")
+
         self.add_subparser(subparsers, "stats", "queue status")
 
         self.add_subparser(subparsers, "list", "queue list")
@@ -191,6 +193,13 @@ class CommandLine:
 
     def cmd_delete(self):
         print(self.client.delete(self.args.queue))
+
+    def cmd_delete_all(self):
+        server, stats = self.client.stats()
+        queues = stats["queues"]
+        for queue in queues.keys():
+            self.client.delete(queue)
+            print("deleted: %s" % queue)
 
     def cmd_stats(self):
         server, stats = self.client.stats()
