@@ -192,7 +192,8 @@ class CommandLine:
         self.client.add(self.args.queue, data)
 
     def cmd_delete(self):
-        print(self.client.delete(self.args.queue))
+        if self.client.delete(self.args.queue):
+            print("deleted: %s" % self.args.queue)
 
     def cmd_delete_all(self):
         server, stats = self.client.stats()
