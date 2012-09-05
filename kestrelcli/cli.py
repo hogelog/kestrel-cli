@@ -10,6 +10,7 @@ import argparse
 import shlex
 import json
 import pprint
+import fnmatch
 
 
 class CommandParser:
@@ -71,11 +72,12 @@ class CommandParser:
 
         self.add_subcommand_parser(subparsers, "delete", "drop a queue")
 
-        self.add_subparser(subparsers, "delete_all", "delete all queues")
+        self.add_patterncommand_parser(subparsers,
+                "delete_all", "delete all queues")
+
+        self.add_patterncommand_parser(subparsers, "list", "queue list")
 
         self.add_subparser(subparsers, "stats", "queue status")
-
-        self.add_subparser(subparsers, "list", "queue list")
 
         self.add_subparser(subparsers, "shell", "interactive shell")
 
@@ -90,6 +92,15 @@ class CommandParser:
             cmdname, help=cmdhelp, add_help=False)
         self.add_argument_help(subparser)
         self.add_arguments_hostport(subparser)
+        return subparser
+
+    def add_patterncommand_parser(self, subparsers, cmdname, cmdhelp):
+        subparser = self.add_subparser(subparsers, cmdname, cmdhelp)
+        subparser.add_argument(
+            "pattern",
+            metavar="<pattern>",
+            nargs="?",
+            help="queue name pattern")
         return subparser
 
     def add_subcommand_parser(self, subparsers, cmdname, cmdhelp):
@@ -197,8 +208,8 @@ class CommandLine:
 
     def cmd_delete_all(self):
         server, stats = self.client.stats()
-        queues = stats["queues"]
-        for queue in queues.keys():
+        queues = self.filter(stats["queues"].keys(), self.args.key)
+        for queue in queues:
             self.client.delete(queue)
             print("deleted: %s" % queue)
 
@@ -209,9 +220,16 @@ class CommandLine:
 
     def cmd_list(self):
         server, stats = self.client.stats()
-        queues = stats["queues"]
-        for queue in queues.keys():
+        queues = self.filter(stats["queues"].keys(), self.args.key)
+
+        for queue in queues:
             print(queue)
+
+    def filter(self, queues, pattern):
+        if pattern:
+            return fnmatch.filter(queues, pattern)
+        else:
+            return queues
 
     def cmd_shell(self):
         hostname = self.args.hostname
