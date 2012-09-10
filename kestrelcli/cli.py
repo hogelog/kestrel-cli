@@ -208,7 +208,7 @@ class CommandLine:
 
     def cmd_delete_all(self):
         server, stats = self.client.stats()
-        queues = self.filter(stats["queues"].keys(), self.args.key)
+        queues = self.filter(stats["queues"].keys(), self.args.pattern)
         for queue in queues:
             self.client.delete(queue)
             print("deleted: %s" % queue)
@@ -220,7 +220,7 @@ class CommandLine:
 
     def cmd_list(self):
         server, stats = self.client.stats()
-        queues = self.filter(stats["queues"].keys(), self.args.key)
+        queues = self.filter(stats["queues"].keys(), self.args.pattern)
 
         for queue in queues:
             print(queue)
